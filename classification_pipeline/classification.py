@@ -54,8 +54,8 @@ class ClassificationPipeline(generic.GenericConfig):
                     cb(id,id,data)
                 pbar.update(batch_size)
 
-    def evaluateAll(self,ds, fold:int,stage=-1,negatives="real",ttflips=None):
-        folds = self.kfold(ds, range(0, len(ds)))
+    def evaluateAll(self,ds, fold:int,stage=-1,negatives="real",ttflips=None,batchSize=32):
+        folds = self.kfold(ds, range(0, len(ds)),batch=batchSize)
         vl, vg, test_g = folds.generator(fold, False,negatives=negatives,returnBatch=True)
         indexes = folds.sampledIndexes(fold, False, negatives)
         m = self.load_model(fold, stage)
@@ -77,10 +77,10 @@ class ClassificationPipeline(generic.GenericConfig):
                 vg.terminate()
         pass
 
-    def evaluate_all_to_arrays(self,ds, fold:int,stage=-1,negatives="real",ttflips=None):
+    def evaluate_all_to_arrays(self,ds, fold:int,stage=-1,negatives="real",ttflips=None,batchSize=32):
         lastFullValPred = None
         lastFullValLabels = None
-        for v in self.evaluateAll(ds, fold, stage,negatives,ttflips):
+        for v in self.evaluateAll(ds, fold, stage,negatives,ttflips,batchSize):
             if lastFullValPred is None:
                 lastFullValPred = v.results
                 lastFullValLabels = v.ground_truth
