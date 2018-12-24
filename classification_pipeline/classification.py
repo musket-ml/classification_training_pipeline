@@ -19,7 +19,7 @@ class ClassificationPipeline(generic.GenericConfig):
         pass
 
     def createStage(self,x):
-        return generic.Stage(x,self)
+        return ClassificationStage(x,self)
 
     def update(self, z, res):
         z.results = res
@@ -131,8 +131,23 @@ class ClassificationPipeline(generic.GenericConfig):
             return model
         return clazz(**cleaned)
 
-
 def parse(path) -> ClassificationPipeline:
     cfg = configloader.parse("classification", path)
     cfg.path = path
     return cfg
+
+class ClassificationStage(generic.Stage):
+    def unfreeze(self, model):
+        for layer in model.layers:
+            layer.trainable = True
+
+        model.compile(model.optimizer, model.loss, model.metrics)
+
+    def freeze(self, model):
+        for layer in model.layers:
+            if isinstance(layer, keras.layers.Dense):
+                break
+
+            layer.trainable = False
+
+        model.compile(model.optimizer, model.loss, model.metrics)
