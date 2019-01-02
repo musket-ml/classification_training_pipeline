@@ -7,6 +7,7 @@ import imgaug
 import numpy as np
 
 custom_models={}
+extra_train=generic.extra_train
 
 
 class ClassificationPipeline(generic.GenericConfig):
@@ -15,7 +16,7 @@ class ClassificationPipeline(generic.GenericConfig):
         super().__init__(**atrs)
         self.dataset_clazz = datasets.KFoldedDataSetImageClassification
         self.flipPred=False
-
+        self.dropout=0
         pass
 
     def createStage(self,x):
@@ -41,7 +42,13 @@ class ClassificationPipeline(generic.GenericConfig):
             cleaned["input_shape"]=(cleaned["input_shape"][0]//self.crops,cleaned["input_shape"][1]//self.crops,cleaned["input_shape"][2])
         cleaned["include_top"]=False
         model1= self.__inner_create(clazz, cleaned)
-        dl = keras.layers.Dense(self.all["classes"], activation=self.all["activation"])(model1.output)
+        cuout=model1.output
+        ac=self.all["activation"];
+        if ac=="none":
+            ac=None
+        if self.dropout>0:
+            cuout=keras.layers.Dropout(self.dropout)(cuout)
+        dl = keras.layers.Dense(self.all["classes"], activation=ac)(cuout)
         model = keras.Model(model1.input, dl)
         return model
 
