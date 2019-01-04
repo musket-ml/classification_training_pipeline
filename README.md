@@ -20,8 +20,33 @@ Let's start from a simple example of classification. Suppose, your data are stru
 ```python
 import musket_core
 from classification_pipeline import classification
+class ProteinDataGenerator:
 
-dataset - ?????????
+    def __init__(self, paths, labels):
+        self.paths, self.labels = paths, labels
+
+
+    def __len__(self):
+        return len(self.paths)
+
+    def __getitem__(self, idx):
+        X,y = self.__load_image(self.paths[idx]),self.labels[idx]
+        return PredictionItem(self.paths[idx],X, y)
+
+    def __load_image(self, path):
+        R = Image.open(path + '_red.png')
+        G = Image.open(path + '_green.png')
+        B = Image.open(path + '_blue.png')
+        Y = Image.open(path + '_yellow.png')
+
+        im = np.stack((
+            np.array(R),
+            np.array(G),
+            np.array(B),
+            np.array(Y)
+        ), -1)
+        return im
+dataset = ProteinDataGenerator(paths,labels)
 cfg = classification.parse("config.yaml")
 cfg.fit(dataset)
 ```
