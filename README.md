@@ -359,13 +359,14 @@ python analize.py --inputFolder ./experiments --output ./result.py
 ## What is supported?
 
 At this moment classification pipeline supports following pre-trained models:
-  - ResNet18
-  - ResNet34
-  - ResNet50(https://arxiv.org/abs/1512.03385)
-  - ResNet101
-  - ResNet152
-  - ResNeXt50
-  - ResNeXt101
+  - Resnet(https://arxiv.org/abs/1512.03385)
+    - ResNet18
+    - ResNet34
+    - ResNet50
+    - ResNet101
+    - ResNet152
+    - ResNeXt50
+    - ResNeXt101
   - VGG16
   - VGG19
   - InceptionV3(https://arxiv.org/abs/1512.00567)
@@ -373,11 +374,13 @@ At this moment classification pipeline supports following pre-trained models:
   - Xception(https://arxiv.org/abs/1610.02357)
   - MobileNet(https://arxiv.org/pdf/1704.04861.pdf)
   - MobileNetV2(https://arxiv.org/abs/1801.04381)
-  - DenseNet121(https://arxiv.org/abs/1608.06993)
-  - DenseNet169(https://arxiv.org/abs/1608.06993)
-  - DenseNet201(https://arxiv.org/abs/1608.06993)
-  - NASNetMobile(https://arxiv.org/abs/1707.07012)
-  - NASNetLarge(https://arxiv.org/abs/1707.07012)
+  - DenseNet(https://arxiv.org/abs/1608.06993):
+    - DenseNet121
+    - DenseNet169
+    - DenseNet201
+  - NasNet(https://arxiv.org/abs/1707.07012):  
+    - NASNetMobile
+    - NASNetLarge
 
 
 Each architecture also supports some specific options, list of options is documented in [segmentation RAML library](segmentation_pipeline/schemas/segmentation.raml#L166).
