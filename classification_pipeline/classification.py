@@ -1,4 +1,6 @@
 from musket_core import configloader, datasets, generic_config as generic
+from segmentation_models.backbones.classification_models.classification_models import ResNet18, ResNet34, ResNet50, ResNet101, ResNet152
+from segmentation_models.backbones.classification_models.classification_models import ResNeXt50, ResNeXt101
 import keras.applications as apps
 import os
 import keras
@@ -6,7 +8,8 @@ import tqdm
 import imgaug
 import numpy as np
 
-custom_models={}
+custom_models={"ResNet18":ResNet18,"ResNet34":ResNet34,"ResNet50":ResNet50,"ResNet101":ResNet101,"ResNet152":ResNet152,
+               "ResNeXt50":ResNeXt50,"ResNeXt101":ResNeXt101}
 extra_train=generic.extra_train
 
 
