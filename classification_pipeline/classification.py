@@ -46,6 +46,8 @@ class ClassificationPipeline(generic.GenericConfig):
         cleaned["include_top"]=False
         model1= self.__inner_create(clazz, cleaned)
         cuout=model1.output
+        if len(cuout.shape) == 4:
+            cuout=keras.layers.GlobalAveragePooling2D()(cuout)
         ac=self.all["activation"];
         if ac=="none":
             ac=None
