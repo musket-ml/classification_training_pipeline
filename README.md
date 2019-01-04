@@ -359,23 +359,26 @@ python analize.py --inputFolder ./experiments --output ./result.py
 ## What is supported?
 
 At this moment classification pipeline supports following pre-trained models:
+  - ResNet18
+  - ResNet34
+  - ResNet50(https://arxiv.org/abs/1512.03385)
+  - ResNet101
+  - ResNet152
+  - ResNeXt50
+  - ResNeXt101
+  - VGG16
+  - VGG19
+  - InceptionV3(https://arxiv.org/abs/1512.00567)
+  - InceptionResNetV2(https://arxiv.org/abs/1602.07261)
+  - Xception(https://arxiv.org/abs/1610.02357)
+  - MobileNet(https://arxiv.org/pdf/1704.04861.pdf)
+  - MobileNetV2(https://arxiv.org/abs/1801.04381)
+  - DenseNet121(https://arxiv.org/abs/1608.06993)
+  - DenseNet169(https://arxiv.org/abs/1608.06993)
+  - DenseNet201(https://arxiv.org/abs/1608.06993)
+  - NASNetMobile(https://arxiv.org/abs/1707.07012)
+  - NASNetLarge(https://arxiv.org/abs/1707.07012)
 
-  - [VGGNet](https://arxiv.org/abs/1409.1556)
-    - vgg16
-    - vgg19
-  - [ResNet50](https://arxiv.org/abs/1512.03385)
-  - [DenseNet](https://arxiv.org/abs/1608.06993)
-    - densenet121
-    - densenet169
-    - densenet201
-  - [Inception-v3](https://arxiv.org/abs/1512.00567)
-  - [Inception-ResNet-v2](https://arxiv.org/abs/1602.07261)
-  - [Xception](https://arxiv.org/abs/1610.02357)
-  - [MobileNet](https://arxiv.org/pdf/1704.04861.pdf)
-  - [MobileNetV2](https://arxiv.org/abs/1801.04381)
-  - [NASNet](https://arxiv.org/abs/1707.07012)
-    - NASNetLarge
-    - NASNetMobile
 
 Each architecture also supports some specific options, list of options is documented in [segmentation RAML library](segmentation_pipeline/schemas/segmentation.raml#L166).
 
