@@ -17,7 +17,7 @@ class ClassificationPipeline(generic.GenericConfig):
 
     def __init__(self,**atrs):
         super().__init__(**atrs)
-        self.dataset_clazz = datasets.KFoldedDataSetImageClassification
+        self.dataset_clazz = datasets.KFoldedDataSet4ImageClassification
         self.flipPred=False
         self.dropout=0
         pass
