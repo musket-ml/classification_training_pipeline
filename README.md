@@ -1,5 +1,40 @@
 # Classification training pipeline
-Puny attempt to build reusable training pipeline for image classification
+My puny attempt to build reusable training pipeline for image classification
+
+  * [Motivation](#motivation)
+  * [Installation](#installation)
+  * [Usage guide](#usage-guide)
+    + [Training a model](#training-a-model)
+      - [Image/Mask Augmentations](#image-and-mask-augmentations)
+      - [Freezing/Unfreezing encoder](#freezing-and-unfreezing-encoder)
+      - [Custom datasets](#custom-datasets)      
+      - [Balancing your data](#balancing-your-data)
+      - [Multistage training](#multistage-training)
+      - [Composite losses](#composite-losses)
+      - [Cyclical learning rates](#cyclical-learning-rates)
+      - [LR Finder](#lr-finder)      
+      - [Background Augmenter](#background-augmenter)
+      - [Training on crops](#training-on-crops)
+    + [Using trained model](#using-trained-model)
+      - [Ensembling predictions and test time augmentation](#ensembling-predictions)
+    + [Custom evaluation code](#custom-evaluation-code)
+    + [Accessing model](#accessing-model)
+  * [Analyzing Experiments Results](#analyzing-experiments-results)
+  * [What is supported?](#what-is-supported-)    
+  * [Custom architectures, callbacks, metrics](#custom-architectures--callbacks--metrics)
+  * [Examples](#examples)
+  * [Faq](#faq)
+
+
+## Motivation
+
+Idea for this project came from my first attempts to participate in Kaggle competitions. My programmers heart was painfully damaged by looking on my own code as well as on other people kernels. Code was highly repetitive, suffering from numerous reimplementations of same or almost same things through the kernels, model/experiment configuration was often mixed with models code, in other words - from programmer perspective it all looked horrible. 
+
+So I decided to extract repetitive things into framework that will work at least for me and will follow these statements: 
+ - experiment configurations should be cleanly separated from model definitions;
+ - experiment configuration files should be easy to compare and should fully describe experiment that is being performed except for the dataset;
+- common blocks like an architecture, callbacks, storing model metrics, visualizing network predictions, should be written once and be a part of common library
+
 
 ## Installation
 
@@ -13,7 +48,7 @@ pip install classification_pipeline
 
 ## Usage guide
 
-### Training a model !!!!!!
+### Training a model 
 
 Let's start from a simple example of classification. Suppose, your data are structured as follows: a .cvs file with images ids and their labels and a folder with all these images. For training a neural network to classify these images all you need are few lines of python code:
 
@@ -189,7 +224,7 @@ class Classification:
 ```   
 
 
-#### Balancing your data ???
+#### Balancing your data 
 
 One common case is the situation when part of your images does not contain any objects of interest, like in 
 [Airbus ship detection challenge](https://www.kaggle.com/c/airbus-ship-detection/overview). More over your data may
@@ -341,7 +376,7 @@ And what if you want to ensemble models from several folds? Just pass a list of 
 ```
 Another supported option is to ensemble results from extra test time augmentation (flips) by adding keyword arg `ttflips=True`.
 
-### Custom evaluation code - ?????? неправильно классифицировались
+### Custom evaluation code 
 
 Sometimes you need to run custom evaluation code. In such case you may use: `evaluateAll` method, which provides an iterator
 on the batches containing original images, training masks and predicted masks
