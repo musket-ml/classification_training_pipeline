@@ -13,7 +13,7 @@ custom_models={"ResNet18":ResNet18,"ResNet34":ResNet34,"ResNet50":ResNet50,"ResN
 extra_train=generic.extra_train
 
 
-class ClassificationPipeline(generic.GenericConfig):
+class ClassificationPipeline(generic.GenericImageTaskConfig):
 
     def __init__(self,**atrs):
         super().__init__(**atrs)
@@ -30,7 +30,6 @@ class ClassificationPipeline(generic.GenericConfig):
         pass
 
     def createNet(self):
-
         if self.architecture in custom_models:
             clazz=custom_models[self.architecture]
         else: clazz = getattr(apps, self.architecture)
