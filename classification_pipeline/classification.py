@@ -40,6 +40,9 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
             pynama = t.alias(arg)
             if not arg in r:
                 cleaned[pynama] = self.all[arg]
+
+        self.clean(cleaned)
+
         if self.crops is not None:
             cleaned["input_shape"]=(cleaned["input_shape"][0]//self.crops,cleaned["input_shape"][1]//self.crops,cleaned["input_shape"][2])
         cleaned["include_top"]=False
