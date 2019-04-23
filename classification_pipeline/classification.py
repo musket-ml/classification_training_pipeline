@@ -7,53 +7,13 @@ import tqdm
 import imgaug
 import numpy as np
 
-from segmentation_models.backbones import get_backbone
+from segmentation_models import backbones
 
 def create_back_bone(name):
     def create(*args, **kwargs):
-        return get_backbone(name.lower(), *args, **kwargs)
+        return backbones.get_backbone(name.lower(), *args, **kwargs)
 
     return create
-
-custom_models = {
-    "ResNet18": create_back_bone("ResNet18"),
-    "ResNet50": create_back_bone("ResNet50"),
-    "ResNet101": create_back_bone("ResNet101"),
-    "ResNet152": create_back_bone("ResNet152"),
-
-    "SEResNet18": create_back_bone("SEResNet18"),
-    "SEResNet34": create_back_bone("SEResNet34"),
-    "SEResNet50": create_back_bone("SEResNet50"),
-    "SEResNet101": create_back_bone("SEResNet101"),
-    "SEResNet152": create_back_bone("SEResNet152"),
-    "SEResNeXt50": create_back_bone("SEResNeXt50"),
-    "SEResNeXt101": create_back_bone("SEResNeXt101"),
-    "SENet154": create_back_bone("SENet154"),
-
-    "ResNet50V2": create_back_bone("ResNet50V2"),
-    "ResNet101V2": create_back_bone("ResNet101V2"),
-    "ResNet152V2": create_back_bone("ResNet152V2"),
-
-    "ResNeXt50": create_back_bone("ResNeXt50"),
-    "ResNeXt101": create_back_bone("ResNeXt101"),
-
-    "VGG16": create_back_bone("VGG16"),
-    "VGG19": create_back_bone("VGG19"),
-
-    "DenseNet121": create_back_bone("DenseNet121"),
-    "DenseNet169": create_back_bone("DenseNet169"),
-    "DenseNet201": create_back_bone("DenseNet201"),
-
-    "InceptionResNetV2": create_back_bone("InceptionResNetV2"),
-    "InceptionV3": create_back_bone("InceptionV3"),
-    "Xception": create_back_bone("Xception"),
-
-    "NASNetLarge": create_back_bone("NASNetLarge"),
-    "NASNetMobile": create_back_bone("NASNetMobile"),
-
-    "MobileNet": create_back_bone("MobileNet"),
-    "MobileNetV2": create_back_bone("MobileNetV2")
-}
 
 extra_train=generic.extra_train
 
@@ -74,8 +34,8 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
         pass
 
     def createNet(self):
-        if self.architecture in custom_models:
-            clazz=custom_models[self.architecture]
+        if self.architecture.lower() in backbones.get_names():
+            clazz = create_back_bone(self.architecture)
         else: clazz = getattr(apps, self.architecture)
         t: configloader.Type = configloader.loaded['classification'].catalog['ClassificationPipeline']
         r = t.custom()
