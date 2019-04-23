@@ -1,6 +1,5 @@
 from musket_core import configloader, datasets, generic_config as generic
-from segmentation_models.backbones.classification_models.classification_models import ResNet18, ResNet34, ResNet50, ResNet101, ResNet152
-from segmentation_models.backbones.classification_models.classification_models import ResNeXt50, ResNeXt101
+
 import keras.applications as apps
 import os
 import keras
@@ -8,10 +7,55 @@ import tqdm
 import imgaug
 import numpy as np
 
-custom_models={"ResNet18":ResNet18,"ResNet34":ResNet34,"ResNet50":ResNet50,"ResNet101":ResNet101,"ResNet152":ResNet152,
-               "ResNeXt50":ResNeXt50,"ResNeXt101":ResNeXt101}
-extra_train=generic.extra_train
+from segmentation_models.backbones import get_backbone
 
+def create_back_bone(name):
+    def create(*args, **kwargs):
+        return get_backbone(name.lower(), *args, **kwargs)
+
+    return create
+
+custom_models = {
+    "ResNet18": create_back_bone("ResNet18"),
+    "ResNet50": create_back_bone("ResNet50"),
+    "ResNet101": create_back_bone("ResNet101"),
+    "ResNet152": create_back_bone("ResNet152"),
+
+    "SEResNet18": create_back_bone("SEResNet18"),
+    "SEResNet34": create_back_bone("SEResNet34"),
+    "SEResNet50": create_back_bone("SEResNet50"),
+    "SEResNet101": create_back_bone("SEResNet101"),
+    "SEResNet152": create_back_bone("SEResNet152"),
+    "SEResNeXt50": create_back_bone("SEResNeXt50"),
+    "SEResNeXt101": create_back_bone("SEResNeXt101"),
+    "SENet154": create_back_bone("SENet154"),
+
+    "ResNet50V2": create_back_bone("ResNet50V2"),
+    "ResNet101V2": create_back_bone("ResNet101V2"),
+    "ResNet152V2": create_back_bone("ResNet152V2"),
+
+    "ResNeXt50": create_back_bone("ResNeXt50"),
+    "ResNeXt101": create_back_bone("ResNeXt101"),
+
+    "VGG16": create_back_bone("VGG16"),
+    "VGG19": create_back_bone("VGG19"),
+
+    "DenseNet121": create_back_bone("DenseNet121"),
+    "DenseNet169": create_back_bone("DenseNet169"),
+    "DenseNet201": create_back_bone("DenseNet201"),
+
+    "InceptionResNetV2": create_back_bone("InceptionResNetV2"),
+    "InceptionV3": create_back_bone("InceptionV3"),
+    "Xception": create_back_bone("Xception"),
+
+    "NASNetLarge": create_back_bone("NASNetLarge"),
+    "NASNetMobile": create_back_bone("NASNetMobile"),
+
+    "MobileNet": create_back_bone("MobileNet"),
+    "MobileNetV2": create_back_bone("MobileNetV2")
+}
+
+extra_train=generic.extra_train
 
 class ClassificationPipeline(generic.GenericImageTaskConfig):
 
