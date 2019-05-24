@@ -136,7 +136,8 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
             if os.path.exists(self.path + ".mdl-nchannel"):
                 cleaned["weights"] = None
                 model = clazz(**cleaned)
-                model.load_weights(self.path + ".mdl-nchannel")
+                weightsPath = self.path + ".mdl-nchannel"
+                model.load_weights(weightsPath)
                 return model
 
             copy = cleaned.copy()
