@@ -49,6 +49,8 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
 
         if self.crops is not None:
             cleaned["input_shape"]=(cleaned["input_shape"][0]//self.crops,cleaned["input_shape"][1]//self.crops,cleaned["input_shape"][2])
+            
+        cleaned["input_shape"]=tuple(cleaned["input_shape"])
         cleaned["include_top"]=False
         model1= self.__inner_create(clazz, cleaned)
         cuout=model1.output
