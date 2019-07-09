@@ -4,7 +4,6 @@ import keras.applications as apps
 import os
 import keras
 import tqdm
-import imgaug
 import numpy as np
 
 from segmentation_models import backbones
@@ -16,7 +15,7 @@ def create_back_bone(name):
     return create
 
 extra_train=generic.extra_train
-
+import tensorflow as tf
 class ClassificationPipeline(generic.GenericImageTaskConfig):
 
     def __init__(self,**atrs):
@@ -34,34 +33,37 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
         pass
 
     def createNet(self):
-        if self.architecture.lower() in backbones.get_names():
-            clazz = create_back_bone(self.architecture)
-        else: clazz = getattr(apps, self.architecture)
-        t: configloader.Type = configloader.loaded['classification'].catalog['ClassificationPipeline']
-        r = t.custom()
-        cleaned = {}
-        for arg in self.all:
-            pynama = t.alias(arg)
-            if not arg in r:
-                cleaned[pynama] = self.all[arg]
-
-        self.clean(cleaned)
-
-        if self.crops is not None:
-            cleaned["input_shape"]=(cleaned["input_shape"][0]//self.crops,cleaned["input_shape"][1]//self.crops,cleaned["input_shape"][2])
-        cleaned["include_top"]=False
-        model1= self.__inner_create(clazz, cleaned)
-        cuout=model1.output
-        if len(cuout.shape) == 4:
-            cuout=keras.layers.GlobalAveragePooling2D()(cuout)
-        ac=self.all["activation"];
-        if ac=="none":
-            ac=None
-        if self.dropout>0:
-            cuout=keras.layers.Dropout(self.dropout)(cuout)
-        dl = keras.layers.Dense(self.all["classes"], activation=ac)(cuout)
-        model = keras.Model(model1.input, dl)
-        return model
+        
+            if self.architecture.lower() in backbones.get_names():
+                clazz = create_back_bone(self.architecture)
+            else: clazz = getattr(apps, self.architecture)
+            t: configloader.Type = configloader.loaded['classification'].catalog['ClassificationPipeline']
+            r = t.custom()
+            cleaned = {}
+            for arg in self.all:
+                pynama = t.alias(arg)
+                if not arg in r:
+                    cleaned[pynama] = self.all[arg]
+    
+            self.clean(cleaned)
+    
+            if self.crops is not None:
+                cleaned["input_shape"]=(cleaned["input_shape"][0]//self.crops,cleaned["input_shape"][1]//self.crops,cleaned["input_shape"][2])
+            cleaned["include_top"]=False
+            model1= self.__inner_create(clazz, cleaned)
+            cuout=model1.output
+            if len(cuout.shape) == 4:
+                #cuout=keras.layers.Flatten()(cuout)
+                cuout=keras.layers.GlobalAveragePooling2D()(cuout)
+                
+            ac=self.all["activation"];
+            if ac=="none":
+                ac=None
+            if self.dropout>0:
+                cuout=keras.layers.Dropout(self.dropout)(cuout)
+            dl = keras.layers.Dense(self.all["classes"], activation=ac)(cuout)
+            model = keras.Model(model1.input, dl)
+            return model
 
     def predict_in_directory(self, spath, fold, stage, cb, data, limit=-1, batch_size=32, ttflips=False):
         with tqdm.tqdm(total=len(generic.dir_list(spath)), unit="files", desc="classification of images from " + str(spath)) as pbar:
@@ -132,7 +134,7 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
         mm=self.encoder_weights
         if mm is None:
             mm=self.weights
-        if cleaned["input_shape"][2] > 3 and mm is not None and len(mm) > 0:
+        if cleaned["input_shape"][2] != 3 and mm is not None and len(mm) > 0:
             if os.path.exists(self.path + ".mdl-nchannel"):
                 cleaned["weights"] = None
                 model = clazz(**cleaned)
@@ -145,7 +147,7 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
             model1 = clazz(**copy)
             cleaned["weights"] = None
             model = clazz(**cleaned)
-            self.adaptNet(model, model1,self.copyWeights)
+            self.adaptNet(model, model1,self.copyWeights,cleaned["input_shape"][2])
             model.save_weights(self.path + ".mdl-nchannel")
             return model
         return clazz(**cleaned)
