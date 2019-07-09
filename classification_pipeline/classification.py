@@ -33,37 +33,36 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
         pass
 
     def createNet(self):
-        
-            if self.architecture.lower() in backbones.get_names():
-                clazz = create_back_bone(self.architecture)
-            else: clazz = getattr(apps, self.architecture)
-            t: configloader.Type = configloader.loaded['classification'].catalog['ClassificationPipeline']
-            r = t.custom()
-            cleaned = {}
-            for arg in self.all:
-                pynama = t.alias(arg)
-                if not arg in r:
-                    cleaned[pynama] = self.all[arg]
-    
-            self.clean(cleaned)
-    
-            if self.crops is not None:
-                cleaned["input_shape"]=(cleaned["input_shape"][0]//self.crops,cleaned["input_shape"][1]//self.crops,cleaned["input_shape"][2])
-            cleaned["include_top"]=False
-            model1= self.__inner_create(clazz, cleaned)
-            cuout=model1.output
-            if len(cuout.shape) == 4:
-                #cuout=keras.layers.Flatten()(cuout)
-                cuout=keras.layers.GlobalAveragePooling2D()(cuout)
-                
-            ac=self.all["activation"];
-            if ac=="none":
-                ac=None
-            if self.dropout>0:
-                cuout=keras.layers.Dropout(self.dropout)(cuout)
-            dl = keras.layers.Dense(self.all["classes"], activation=ac)(cuout)
-            model = keras.Model(model1.input, dl)
-            return model
+        if self.architecture.lower() in backbones.get_names():
+            clazz = create_back_bone(self.architecture)
+        else: clazz = getattr(apps, self.architecture)
+        t: configloader.Type = configloader.loaded['classification'].catalog['ClassificationPipeline']
+        r = t.custom()
+        cleaned = {}
+        for arg in self.all:
+            pynama = t.alias(arg)
+            if not arg in r:
+                cleaned[pynama] = self.all[arg]
+
+        self.clean(cleaned)
+
+        if self.crops is not None:
+            cleaned["input_shape"]=(cleaned["input_shape"][0]//self.crops,cleaned["input_shape"][1]//self.crops,cleaned["input_shape"][2])
+            
+        cleaned["input_shape"]=tuple(cleaned["input_shape"])
+        cleaned["include_top"]=False
+        model1= self.__inner_create(clazz, cleaned)
+        cuout=model1.output
+        if len(cuout.shape) == 4:
+            cuout=keras.layers.GlobalAveragePooling2D()(cuout)
+        ac=self.all["activation"];
+        if ac=="none":
+            ac=None
+        if self.dropout>0:
+            cuout=keras.layers.Dropout(self.dropout)(cuout)
+        dl = keras.layers.Dense(self.all["classes"], activation=ac)(cuout)
+        model = keras.Model(model1.input, dl)
+        return model
 
     def predict_in_directory(self, spath, fold, stage, cb, data, limit=-1, batch_size=32, ttflips=False):
         with tqdm.tqdm(total=len(generic.dir_list(spath)), unit="files", desc="classification of images from " + str(spath)) as pbar:
