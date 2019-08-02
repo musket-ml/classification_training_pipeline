@@ -4,7 +4,6 @@ import keras.applications as apps
 import os
 import keras
 import tqdm
-import imgaug
 import numpy as np
 
 from segmentation_models import backbones
@@ -16,7 +15,7 @@ def create_back_bone(name):
     return create
 
 extra_train=generic.extra_train
-
+import tensorflow as tf
 class ClassificationPipeline(generic.GenericImageTaskConfig):
 
     def __init__(self,**atrs):
@@ -49,6 +48,8 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
 
         if self.crops is not None:
             cleaned["input_shape"]=(cleaned["input_shape"][0]//self.crops,cleaned["input_shape"][1]//self.crops,cleaned["input_shape"][2])
+            
+        cleaned["input_shape"]=tuple(cleaned["input_shape"])
         cleaned["include_top"]=False
         model1= self.__inner_create(clazz, cleaned)
         cuout=model1.output
@@ -132,11 +133,12 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
         mm=self.encoder_weights
         if mm is None:
             mm=self.weights
-        if cleaned["input_shape"][2] > 3 and mm is not None and len(mm) > 0:
+        if cleaned["input_shape"][2] != 3 and mm is not None and len(mm) > 0:
             if os.path.exists(self.path + ".mdl-nchannel"):
                 cleaned["weights"] = None
                 model = clazz(**cleaned)
-                model.load_weights(self.path + ".mdl-nchannel")
+                weightsPath = self.path + ".mdl-nchannel"
+                model.load_weights(weightsPath)
                 return model
 
             copy = cleaned.copy()
@@ -144,7 +146,7 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
             model1 = clazz(**copy)
             cleaned["weights"] = None
             model = clazz(**cleaned)
-            self.adaptNet(model, model1,self.copyWeights)
+            self.adaptNet(model, model1,self.copyWeights,cleaned["input_shape"][2])
             model.save_weights(self.path + ".mdl-nchannel")
             return model
         return clazz(**cleaned)
