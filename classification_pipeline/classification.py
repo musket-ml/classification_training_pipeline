@@ -37,7 +37,7 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
             clazz = create_back_bone(self.architecture)
         else: clazz = getattr(apps, self.architecture)
         t: configloader.Type = configloader.loaded['classification'].catalog['ClassificationPipeline']
-        r = t.custom()
+        r = t.customProperties()
         cleaned = {}
         for arg in self.all:
             pynama = t.alias(arg)
