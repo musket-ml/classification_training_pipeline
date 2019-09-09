@@ -102,3 +102,13 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+.idea/
+.settings/
+.project
+.pydevproject
+**/.idea/
+**/.settings/
+**/.project
+**/.pydevproject
+*.iml
