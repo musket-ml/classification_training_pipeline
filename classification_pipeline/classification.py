@@ -33,9 +33,20 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
         pass
 
     def createNet(self):
-        if self.architecture.lower() in backbones.get_names():
+        if self.architecture in configloader.load("layers").catalog:
+            clazz=configloader.load("layers").catalog[self.architecture].func
+        elif self.architecture.lower() in backbones.get_names():
             clazz = create_back_bone(self.architecture)
-        else: clazz = getattr(apps, self.architecture)
+        else:    
+            try:
+                clazz = classification_models.Classifiers.get_classifier(self.architecture.lower())
+            except:        
+                try:
+                     clazz = getattr(apps, self.architecture)
+                except:  
+                    print("Unknown architeture:"+self.backbone)
+                    print ("Known archectures:",classification_models.Classifiers.names());
+                    raise ValueError("Unknown architecture")
         t: configloader.Type = configloader.loaded['classification'].catalog['ClassificationPipeline']
         r = t.customProperties()
         cleaned = {}
