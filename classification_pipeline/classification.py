@@ -5,7 +5,7 @@ import os
 import keras
 import tqdm
 import numpy as np
-
+import classification_models
 from segmentation_models import backbones
 
 def create_back_bone(name):
