@@ -71,8 +71,15 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
             ac=None
         if self.dropout>0:
             cuout=keras.layers.Dropout(self.dropout)(cuout)
-        dl = keras.layers.Dense(self.all["classes"], activation=ac)(cuout)
-        model = keras.Model(model1.input, dl)
+        if isinstance(ac, list):
+           ls=[]
+           for i in range(len(ac)):
+               dl = keras.layers.Dense(self.all["classes"][i], activation=ac[i])(cuout)
+               ls.append(dl)
+           model = keras.Model(model1.input,ls)    
+        else:        
+            dl = keras.layers.Dense(self.all["classes"], activation=ac)(cuout)
+            model = keras.Model(model1.input, dl)
         return model
 
     def predict_in_directory(self, spath, fold, stage, cb, data, limit=-1, batch_size=32, ttflips=False):
