@@ -38,10 +38,7 @@ So I decided to extract repetitive things into framework that will work at least
 
 ## Installation
 
-At this moment library requires the latest version of imgaug which has not been published yet to pip, so installation requires
-execution of following two commands 
 ```
-pip install git+https://github.com/aleju/imgaug
 pip install classification_pipeline
 ```
 *Note: this package requires python 3.6*
@@ -221,7 +218,25 @@ class Classification:
         img = cv2.resize(img.copy(), target_size, interpolation = cv2.INTER_AREA)
         return img
     
-```   
+```
+
+### Multi output classification
+
+Sometimes you need to create network that performs several classification tasks at the same moment, in this situation
+you need to declare `classes` , `activation` and `loss` as the lists of class counts, activation functions and losses
+like in the following snippet:
+
+```yaml
+classes: [ 4, 4 ] #define the number of classes
+activation: [sigmoid,sigmoid]
+loss: 
+  - binary_crossentropy
+  - binary_crossentropy
+primary_metric: val_loss #the most interesting metric is val_binary_accuracy
+primary_metric_mode: min  
+```
+
+it is also very likely that you need to change primary metric to `val_loss`   
 
 
 #### Balancing your data 
