@@ -1,4 +1,7 @@
 # Classification training pipeline
+
+![Build status](https://travis-ci.com/musket-ml/classification_training_pipeline.svg?branch=master)
+
 My puny attempt to build reusable training pipeline for image classification
 
   * [Motivation](#motivation)
