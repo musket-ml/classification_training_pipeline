@@ -10,7 +10,7 @@ with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = '\n' + f.read()
 
 setup(name='classification_pipeline',
-      version='0.431',
+      version='0.432',
       description='Classification support piepeline for Musket ML',
       long_description=long_description,
       url='https://github.com/musket-ml/classification_training_pipeline',
