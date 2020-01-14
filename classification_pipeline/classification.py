@@ -154,27 +154,38 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
                 pbar.update(batch_size)
         return np.array(res)
 
-    def __inner_create(self, clazz, cleaned):
+    def __inner_create(self, initializer, cleaned_args):
         mm=self.encoder_weights
         if mm is None:
             mm=self.weights
-        if cleaned["input_shape"][2] != 3 and mm is not None and len(mm) > 0:
+        if cleaned_args["input_shape"][2] != 3 and mm is not None and len(mm) > 0:
             if os.path.exists(self.path + ".mdl-nchannel"):
-                cleaned["weights"] = None
-                model = clazz(**cleaned)
+                cleaned_args["weights"] = None
+                model = self.call_initializer(initializer, cleaned_args)
                 weightsPath = self.path + ".mdl-nchannel"
                 model.load_weights(weightsPath)
                 return model
 
-            copy = cleaned.copy()
-            copy["input_shape"] = (cleaned["input_shape"][0], cleaned["input_shape"][1], 3)
-            model1 = clazz(**copy)
-            cleaned["weights"] = None
-            model = clazz(**cleaned)
-            self.adaptNet(model, model1,self.copyWeights,cleaned["input_shape"][2])
+            args_copy = cleaned_args.copy()
+            args_copy["input_shape"] = (cleaned_args["input_shape"][0], cleaned_args["input_shape"][1], 3)
+            model1 = self.call_initializer(initializer, args_copy)
+            cleaned_args["weights"] = None
+            model = self.call_initializer(initializer, cleaned_args)
+            self.adaptNet(model, model1,self.copyWeights,cleaned_args["input_shape"][2])
             model.save_weights(self.path + ".mdl-nchannel")
             return model
-        return clazz(**cleaned)
+        return self.call_initializer(initializer, cleaned_args)
+    
+    def call_initializer(self, initializer, kwargs):
+        while len(kwargs) > 0:
+            try:
+                return initializer(**kwargs)
+            except TypeError as e:
+                invalid = re.findall("'([^']*)'", e.args[0])
+                for arg in invalid:
+                    logging.warning("Parameter '{0}' is not supported by architecture '{1}'".format(arg, self.architecture))
+                    kwargs.pop(arg, None)
+        return initializer(**kwargs)
 
 def parse(path) -> ClassificationPipeline:
     cfg = configloader.parse("classification", path)
