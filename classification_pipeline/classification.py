@@ -32,7 +32,11 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
         z.results = res
         pass
 
+
     def createNet(self):
+         return self.createNet1(False)
+
+    def createNet1(self, forInference):
         if self.architecture in configloader.load("layers").catalog:
             clazz=configloader.load("layers").catalog[self.architecture].func
         elif self.architecture.lower() in backbones.get_names():
@@ -62,6 +66,9 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
             
         cleaned["input_shape"]=tuple(cleaned["input_shape"])
         cleaned["include_top"]=False
+        if forInference:
+            cleaned["weights"] = None
+
         model1= self.__inner_create(clazz, cleaned)
         cuout=model1.output
         if len(cuout.shape) == 4:
