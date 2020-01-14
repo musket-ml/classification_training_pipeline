@@ -66,7 +66,7 @@ class ClassificationPipeline(generic.GenericImageTaskConfig):
             
         cleaned["input_shape"]=tuple(cleaned["input_shape"])
         cleaned["include_top"]=False
-        if forInference:
+        if forInference and 'weights' in cleaned:
             cleaned["weights"] = None
 
         model1= self.__inner_create(clazz, cleaned)
